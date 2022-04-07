@@ -33,7 +33,9 @@ typedef struct SampleFmtInfo {
 } SampleFmtInfo;
 
 /** this table gives more information about formats */
+// 这里的写法是C语言数组写法
 static const SampleFmtInfo sample_fmt_info[AV_SAMPLE_FMT_NB] = {
+    // 指定数组某个索引位置的内容
     [AV_SAMPLE_FMT_U8]   = { .name =   "u8", .bits =  8, .planar = 0, .altform = AV_SAMPLE_FMT_U8P  },
     [AV_SAMPLE_FMT_S16]  = { .name =  "s16", .bits = 16, .planar = 0, .altform = AV_SAMPLE_FMT_S16P },
     [AV_SAMPLE_FMT_S32]  = { .name =  "s32", .bits = 32, .planar = 0, .altform = AV_SAMPLE_FMT_S32P },
@@ -105,8 +107,11 @@ char *av_get_sample_fmt_string (char *buf, int buf_size, enum AVSampleFormat sam
     return buf;
 }
 
+/// 根据AVSampleFormat获取每个样本所占字节数【单声道】
+/// @param sample_fmt fmt格式枚举
 int av_get_bytes_per_sample(enum AVSampleFormat sample_fmt)
 {
+    //判断枚举值是否合法： sample_fmt < 0 || sample_fmt >= AV_SAMPLE_FMT_NB
      return sample_fmt < 0 || sample_fmt >= AV_SAMPLE_FMT_NB ?
         0 : sample_fmt_info[sample_fmt].bits >> 3;
 }
