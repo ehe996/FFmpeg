@@ -176,9 +176,12 @@ int av_samples_fill_arrays(uint8_t **audio_data, int *linesize,
 
     if (!buf)
         return buf_size;
-
+    // 结合内存图来看：这里就是让 uint8_t* 指向音频数据[uint8_t]所在内存区域；
     audio_data[0] = (uint8_t *)buf;
+    // 如果是普通PCM数据，就只有一个uint8_t*，如果是planner，那么就有nb_channels个
     for (ch = 1; planar && ch < nb_channels; ch++)
+        //audio_data[1] = audio_data[0] + line_size , line_size就是planner单个声道的数据长度
+        // 可以理解为：第二个uint8_t*指向的区域是  audio_data[0] + line_size，也就是指针向后偏移 line_size
         audio_data[ch] = audio_data[ch-1] + line_size;
 
     return buf_size;
@@ -188,6 +191,7 @@ int av_samples_alloc(uint8_t **audio_data, int *linesize, int nb_channels,
                      int nb_samples, enum AVSampleFormat sample_fmt, int align)
 {
     uint8_t *buf;
+    // 计算所需缓冲区大小
     int size = av_samples_get_buffer_size(NULL, nb_channels, nb_samples,
                                           sample_fmt, align);
     if (size < 0)
@@ -209,16 +213,21 @@ int av_samples_alloc(uint8_t **audio_data, int *linesize, int nb_channels,
     return size;
 }
 
+// 创建缓冲区
 int av_samples_alloc_array_and_samples(uint8_t ***audio_data, int *linesize, int nb_channels,
                                        int nb_samples, enum AVSampleFormat sample_fmt, int align)
 {
+    // 如果是planar，返回nb_channels，否则返回 1；
     int ret, nb_planes = av_sample_fmt_is_planar(sample_fmt) ? nb_channels : 1;
-
+    // 给*audio_data指向的区域分配内存空间。【音频重采样中，由于不是planner，所以这里nb_planes为1】
+    //相当于 inData = av_calloc(1, sizeof(uint_8 *));
     *audio_data = av_calloc(nb_planes, sizeof(**audio_data));
     if (!*audio_data)
         return AVERROR(ENOMEM);
+    // 这里可以理解为：分配一段内存空间buff [uint_8]类型，用来存放音频数据，然后用上面 uint_8 *指向这段内存空间
     ret = av_samples_alloc(*audio_data, linesize, nb_channels,
                            nb_samples, sample_fmt, align);
+    // 上面这段代码，结合音频重采样内存图来看。
     if (ret < 0)
         av_freep(audio_data);
     return ret;

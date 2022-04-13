@@ -272,6 +272,7 @@ void *av_mallocz(size_t size)
 void *av_calloc(size_t nmemb, size_t size)
 {
     size_t result;
+    // 这里相当于：result = nmemb * size
     if (size_mult(nmemb, size, &result) < 0)
         return NULL;
     return av_mallocz(result);

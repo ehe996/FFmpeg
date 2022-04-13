@@ -78,8 +78,12 @@ static void fill_samples(double *dst, int nb_samples, int nb_channels, int sampl
     }
 }
 
+
 int main(int argc, char **argv)
 {
+    /**
+     这里是ffmpeg官方的dmeo，关于音频重采样
+     */
     AVChannelLayout src_ch_layout = AV_CHANNEL_LAYOUT_STEREO, dst_ch_layout = AV_CHANNEL_LAYOUT_SURROUND;
     int src_rate = 48000, dst_rate = 44100;
     uint8_t **src_data = NULL, **dst_data = NULL;
@@ -138,6 +142,7 @@ int main(int argc, char **argv)
     /* allocate source and destination samples buffers */
 
     src_nb_channels = src_ch_layout.nb_channels;
+    // 创建输入缓冲区
     ret = av_samples_alloc_array_and_samples(&src_data, &src_linesize, src_nb_channels,
                                              src_nb_samples, src_sample_fmt, 0);
     if (ret < 0) {
@@ -153,6 +158,7 @@ int main(int argc, char **argv)
 
     /* buffer is going to be directly written to a rawaudio file, no alignment */
     dst_nb_channels = dst_ch_layout.nb_channels;
+    // 创建输出缓冲区
     ret = av_samples_alloc_array_and_samples(&dst_data, &dst_linesize, dst_nb_channels,
                                              dst_nb_samples, dst_sample_fmt, 0);
     if (ret < 0) {
