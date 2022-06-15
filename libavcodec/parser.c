@@ -32,13 +32,14 @@
 AVCodecParserContext *av_parser_init(int codec_id)
 {
     AVCodecParserContext *s = NULL;
+    // 这里有parser属性
     const AVCodecParser *parser;
     void *i = 0;
     int ret;
 
     if (codec_id == AV_CODEC_ID_NONE)
         return NULL;
-
+    // 迭代查找codec_id对应的parser（例如：ff_aac_parser），就是穷举parser支持的codec里面(parser->codec_ids)有没有你传进来的这个 codec_id。 这里 codec_ids声明的时候，就声明的固定长度7，所以这里不会越界。
     while ((parser = av_parser_iterate(&i))) {
         if (parser->codec_ids[0] == codec_id ||
             parser->codec_ids[1] == codec_id ||
@@ -55,6 +56,7 @@ found:
     s = av_mallocz(sizeof(AVCodecParserContext));
     if (!s)
         goto err_out;
+    // 找到parser之后，给 ParserContext 的 parser 属性赋值
     s->parser = parser;
     s->priv_data = av_mallocz(parser->priv_data_size);
     if (!s->priv_data)
@@ -159,6 +161,7 @@ int av_parser_parse2(AVCodecParserContext *s, AVCodecContext *avctx,
         s->last_pos        = s->pos;
         ff_fetch_timestamp(s, 0, 0, 0);
     }
+    /** 核心逻辑，在这里拿到 parser对象，调用parser_parse方法，我们想知道在哪里对parser->parser_parse赋值的，搜索parser_parse = ，发现没有找到合适。那么有可能是用 parser = 这样的赋值方式，说明 s->parser 来到这里之前就已经有值了，那么我们的查找应该更往前一些，在调用当前方法av_parser_parse2之前。也就是 av_parser_init方法*/
     /* WARNING: the returned index can be negative */
     index = s->parser->parser_parse(s, avctx, (const uint8_t **) poutbuf,
                                     poutbuf_size, buf, buf_size);
@@ -237,7 +240,7 @@ int ff_combine_frame(ParseContext *pc, int next,
     }
 
     av_assert0(next >= 0 || pc->buffer);
-
+    // 内部改了 buf_size
     *buf_size          =
     pc->overread_index = pc->index + next;
 

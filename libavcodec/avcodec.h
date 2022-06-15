@@ -2952,6 +2952,7 @@ typedef struct AVCodecParser {
     int (*parser_init)(AVCodecParserContext *s);
     /* This callback never returns an error, a negative value means that
      * the frame start was in a previous packet. */
+    // 这里是个函数指针，那么肯定有地方对他进行赋值，然后在某个地方回调
     int (*parser_parse)(AVCodecParserContext *s,
                         AVCodecContext *avctx,
                         const uint8_t **poutbuf, int *poutbuf_size,

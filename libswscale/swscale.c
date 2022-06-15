@@ -884,6 +884,7 @@ static int scale_internal(SwsContext *c,
     const int scale_dst = dstSliceY > 0 || dstSliceH < c->dstH;
     const int frame_start = scale_dst || !c->sliceDir;
     int i, ret;
+    // 这里src2和 dst2长度都是4，为了兼容一些格式，如：RGBA，他们有4个planner
     const uint8_t *src2[4];
     uint8_t *dst2[4];
     int macro_height_src = isBayer(c->srcFormat) ? 2 : (1 << c->chrSrcVSubSample);

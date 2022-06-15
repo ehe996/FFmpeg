@@ -3991,6 +3991,7 @@ CODEC_LIST="
     $ENCODER_LIST
     $DECODER_LIST
 "
+#感觉这地方像是给PARSER_LIST赋值的地方，没太明白这是什么技术实现
 PARSER_LIST=$(find_things_extern parser AVCodecParser libavcodec/parsers.c)
 BSF_LIST=$(find_things_extern bsf FFBitStreamFilter libavcodec/bitstream_filters.c)
 HWACCEL_LIST=$(find_things_extern hwaccel AVHWAccel libavcodec/hwaccels.h)

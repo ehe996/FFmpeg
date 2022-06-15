@@ -61,11 +61,13 @@ static av_cold int aac_parse_init(AVCodecParserContext *s1)
     return 0;
 }
 
-
+//ff_aac_parser对应的结构体，初始化赋值
 const AVCodecParser ff_aac_parser = {
+    //ff_aac_parser支持的codec_ids数组，当你用AV_CODEC_ID_AAC来找parser的时候，就能找到这里复合条件
     .codec_ids      = { AV_CODEC_ID_AAC },
     .priv_data_size = sizeof(AACAC3ParseContext),
     .parser_init    = aac_parse_init,
+    // 给parser_parse函数指针赋值，最终调用ff_aac_parser的 parser_parse方法的时候，就是调用到 ff_aac_ac3_parse 这个方法
     .parser_parse   = ff_aac_ac3_parse,
     .parser_close   = ff_parse_close,
 };

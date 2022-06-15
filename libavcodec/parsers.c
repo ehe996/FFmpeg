@@ -78,11 +78,13 @@ extern const AVCodecParser ff_xma_parser;
 
 const AVCodecParser *av_parser_iterate(void **opaque)
 {
+    // 拿到索引值
     uintptr_t i = (uintptr_t)*opaque;
+    // 从parser_list数组中查找
     const AVCodecParser *p = parser_list[i];
-
+    // 如果找到了对应的parse，这里把外面传进来的opaque索引改变，
     if (p)
         *opaque = (void*)(i + 1);
-
+    // 并且返回找到的parser
     return p;
 }

@@ -27,6 +27,8 @@
 #include "parser.h"
 #include "aac_ac3_parser.h"
 
+// 这里poutbuf、poutbuf 对应 pkt->data，pkt->size；
+//buf、buf_size 对应 inData，inLen
 int ff_aac_ac3_parse(AVCodecParserContext *s1,
                      AVCodecContext *avctx,
                      const uint8_t **poutbuf, int *poutbuf_size,
@@ -69,13 +71,14 @@ get_next:
         }
     }
 
+    // 合并帧 ff_combine_frame，函数内部改了 buf_size 
     if(ff_combine_frame(pc, i, &buf, &buf_size)<0){
         s->remaining_size -= FFMIN(s->remaining_size, buf_size);
         *poutbuf = NULL;
         *poutbuf_size = 0;
         return buf_size;
     }
-
+    // 关键代码，将他们两个建立联系
     *poutbuf = buf;
     *poutbuf_size = buf_size;
 
